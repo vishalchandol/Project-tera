@@ -3,7 +3,7 @@ name: Terraform Workflow
 on:
   push:
     branches:
-      - main  # Run when code is pushed to the main branch
+      - myaws8  # Run when code is pushed to the main branch
   workflow_dispatch:  # Allow manual trigger
 
 jobs:
