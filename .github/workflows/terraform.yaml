@@ -3,7 +3,7 @@ name: Terraform Workflow
 on:
   push:
     branches:
-      - myaws8    # Replace with your branch name
+      - myawsB    # Replace with your branch name
   workflow_dispatch:  # Allow manual runs
 
 jobs:
