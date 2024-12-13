@@ -35,6 +35,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1  # Replace with your desired AWS region
 
+      # Step 4.0: Navigate to the Terraform code directory
+      - name: Change to Terraform Directory
+        working-directory: .vs/P
+        run: echo "Working in $(pwd)"    
+
       # Step 4: Terraform Init
       - name: Terraform Init
         run: terraform init
