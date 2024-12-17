@@ -1,0 +1,142 @@
+{
+    "Vpcs": [
+        {
+            "CidrBlock": "10.0.128.0/24",
+            "DhcpOptionsId": "dopt-0f418077d0e1491c5",
+            "State": "available",
+            "VpcId": "vpc-091efd4b5e1c49d47",
+            "OwnerId": "612117410675",
+            "InstanceTenancy": "default",
+            "Ipv6CidrBlockAssociationSet": [
+                {
+                    "AssociationId": "vpc-cidr-assoc-05d20d22a5a8b8c0d",
+                    "Ipv6CidrBlock": "2600:1f18:6b73:fe00::/56",
+                    "Ipv6CidrBlockState": {
+                        "State": "associated"
+                    },
+                    "NetworkBorderGroup": "us-east-1",
+                    "Ipv6Pool": "Amazon"
+                }
+            ],
+            "CidrBlockAssociationSet": [
+                {
+                    "AssociationId": "vpc-cidr-assoc-0a387a19a7be3e850",
+                    "CidrBlock": "10.0.128.0/24",
+                    "CidrBlockState": {
+                        "State": "associated"
+                    }
+                }
+            ],
+            "IsDefault": false,
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "test-IPv6"
+                }
+            ]
+        },
+        {
+            "CidrBlock": "10.0.0.0/16",
+            "DhcpOptionsId": "dopt-0f418077d0e1491c5",
+            "State": "available",
+            "VpcId": "vpc-047c1c3123b3daa46",
+            "OwnerId": "612117410675",
+            "InstanceTenancy": "default",
+            "CidrBlockAssociationSet": [
+                {
+                    "AssociationId": "vpc-cidr-assoc-04b8333e29f2fd15c",
+                    "CidrBlock": "10.0.0.0/16",
+                    "CidrBlockState": {
+                        "State": "associated"
+                    }
+                },
+                {
+                    "AssociationId": "vpc-cidr-assoc-0564b9b2c19deb506",
+                    "CidrBlock": "100.200.128.0/20",
+                    "CidrBlockState": {
+                        "State": "associated"
+                    }
+                }
+            ],
+            "IsDefault": false,
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "TestVPC1"
+                }
+            ]
+        },
+        {
+            "CidrBlock": "172.31.0.0/16",
+            "DhcpOptionsId": "dopt-0f418077d0e1491c5",
+            "State": "available",
+            "VpcId": "vpc-0cea3e83f09d8161e",
+            "OwnerId": "612117410675",
+            "InstanceTenancy": "default",
+            "CidrBlockAssociationSet": [
+                {
+                    "AssociationId": "vpc-cidr-assoc-09a26d28632498d55",
+                    "CidrBlock": "172.31.0.0/16",
+                    "CidrBlockState": {
+                        "State": "associated"
+                    }
+                }
+            ],
+            "IsDefault": true,
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "VPC0"
+                }
+            ]
+        },
+        {
+            "CidrBlock": "10.3.0.0/16",
+            "DhcpOptionsId": "dopt-0f418077d0e1491c5",
+            "State": "available",
+            "VpcId": "vpc-05d448460a25d6e81",
+            "OwnerId": "612117410675",
+            "InstanceTenancy": "default",
+            "CidrBlockAssociationSet": [
+                {
+                    "AssociationId": "vpc-cidr-assoc-064ce872806a91bbe",
+                    "CidrBlock": "10.3.0.0/16",
+                    "CidrBlockState": {
+                        "State": "associated"
+                    }
+                }
+            ],
+            "IsDefault": false,
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "main"
+                }
+            ]
+        },
+        {
+            "CidrBlock": "172.16.0.0/16",
+            "DhcpOptionsId": "dopt-0f418077d0e1491c5",
+            "State": "available",
+            "VpcId": "vpc-0be81d64fc3ed7d9d",
+            "OwnerId": "612117410675",
+            "InstanceTenancy": "default",
+            "CidrBlockAssociationSet": [
+                {
+                    "AssociationId": "vpc-cidr-assoc-0cbaac5793772334b",
+                    "CidrBlock": "172.16.0.0/16",
+                    "CidrBlockState": {
+                        "State": "associated"
+                    }
+                }
+            ],
+            "IsDefault": false,
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "TestVPC2"
+                }
+            ]
+        }
+    ]
+}
