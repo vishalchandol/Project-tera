@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: default
+data:
+  index.html: |
+    <html>
+      <head><title>Nginx</title></head>
+      <body>
+        <h1>Hello, I am nginx</h1>
+      </body>
+    </html>
