@@ -31,15 +31,28 @@ jobs:
           fi
         shell: bash
 
+      - name: Change to Terraform Directory
+        run: |
+          cd MYoffice
+          ls -l  # Debugging step to check files
+
       - name: Terraform Init
-        run: terraform init
+        run: |
+          cd MYoffice
+          terraform init
 
       - name: Terraform Validate
-        run: terraform validate
+        run: |
+          cd MYoffice
+          terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -out=tfplan -var-file=MYoffice/${{ env.ENV }}/terraform.tfvars
-  # MYoffice/prod
+        run: |
+          cd MYoffice
+          terraform plan -out=tfplan -var-file=${{ env.ENV }}/terraform.tfvars
+
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev'
-        run: terraform apply -auto-approve tfplan
+        run: |
+          cd MYoffice
+          terraform apply -auto-approve tfplan
