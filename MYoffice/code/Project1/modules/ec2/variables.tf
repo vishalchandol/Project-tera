@@ -5,6 +5,6 @@ variable "env" {
 variable "sub_id" {
   type = list(string)
 }
-variable "sg-inst" {
+variable "sg_inst" {
   type = list(string)
 }

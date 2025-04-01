@@ -11,7 +11,7 @@ module "vpc" {
 module "ec2" {
   source = "./code/Project1/modules/ec2"
   sub_id = var.sub_id
-  sg-inst = var.sg-inst
+  sg-inst = var.sg_inst
   env = var.env
 }
 

@@ -16,7 +16,7 @@ resource "aws_instance" "inst1" {
     name = "${var.env}inst"
   }
 
-  vpc_security_group_ids = var.sg-inst
+  vpc_security_group_ids = var.sg_inst
   source_dest_check = false
  # key_name = aws_key_pair.kp1.key_name
 
