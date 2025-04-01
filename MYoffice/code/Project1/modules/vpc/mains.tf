@@ -77,6 +77,7 @@ resource "aws_security_group_rule" "sg1-rules-ing" {
   to_port = 65535
   protocol = "tcp"
   type = "ingress"
+  cidr_blocks = [ "0.0.0.0/0" ]
 }
 resource "aws_security_group_rule" "sg1-rules-eg" {
   security_group_id = aws_security_group.sg1.id
@@ -84,6 +85,8 @@ resource "aws_security_group_rule" "sg1-rules-eg" {
   to_port = 65535
   protocol = "tcp"
   type = "egress"
+    cidr_blocks = [ "0.0.0.0/0" ]
+
 }
 resource "aws_network_acl" "acl1" {
   vpc_id = aws_vpc.vpc1.id
