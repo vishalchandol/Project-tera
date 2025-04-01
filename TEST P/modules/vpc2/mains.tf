@@ -81,6 +81,7 @@ resource "aws_main_route_table_association" "Main_route_vpc02" {
   vpc_id = aws_vpc.vpc02.id
 }
 
+
 resource "aws_security_group" "sg-allow-vpc02" {
   name = "mysg-all-vpc02"
   vpc_id = aws_vpc.vpc02.id
@@ -211,7 +212,7 @@ resource "aws_instance" "inst1" {
   tags = {
     name = "testLin"
   }
-  security_groups = [ aws_security_group.sg-allow-vpc02.id]
+  security_groups = [ aws_security_group.sg-allow-vpc02.id]  //obsolete -instead use vpc_security_group_ids
   key_name = aws_key_pair.kp1.key_name
 }
 /***

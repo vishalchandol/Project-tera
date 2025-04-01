@@ -1,5 +1,6 @@
 version: "3.9"
 services:
+
   nginx:
     build:
       context: ./nginx
@@ -14,6 +15,7 @@ services:
         delay: 10s  
     volumes:
       - web-data:/usr/share/nginx/html
+      
   apache:
     build:
       context: ./apache
