@@ -24,10 +24,10 @@ jobs:
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "ENV=prod" >> $GITHUB_ENV
-          elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
-            echo "ENV=staging" >> $GITHUB_ENV
-          else
+          elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
             echo "ENV=dev" >> $GITHUB_ENV
+          else
+            echo "ENV=staging" >> $GITHUB_ENV
           fi
         shell: bash
 
