@@ -17,7 +17,7 @@ resource "aws_subnet" "pubsub" {
     count = length(pubsub_cidr)
   vpc_id = aws_vpc.vpc1.id
   cidr_block = var.pubsub_cidr[count.index]
-  availability_zone = var.az
+  availability_zone = var.az[count.index]
   tags = {
     Name = "${var.env}-pub_sub${count}"
   }
@@ -28,7 +28,7 @@ resource "aws_subnet" "privsub" {
     count = length(privsub_cidr)
   vpc_id = aws_vpc.vpc1.id
   cidr_block = var.privsub_cidr[count.index]
-  availability_zone = var.az
+  availability_zone = var.az[count.index]
   tags = "${var.env}-priv_sub${count}"
 
 }

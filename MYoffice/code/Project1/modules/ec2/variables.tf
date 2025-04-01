@@ -3,8 +3,8 @@ variable "env" {
 }
 
 variable "sub_id" {
-  type = list()
+  type = list(string)
 }
 variable "sg-inst" {
-  type = list()
+  type = list(string)
 }

@@ -10,7 +10,7 @@ resource "aws_instance" "inst1" {
   #ami = "ami-015612a97cb1d6952"
   ami = "ami-071226ecf16aa7d96"
  
-  subnet_id = var.sub_id
+  subnet_id = var.sub_id[0]
   associate_public_ip_address = true
   tags = {
     name = "${var.env}inst"

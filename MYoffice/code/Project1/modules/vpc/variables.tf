@@ -13,15 +13,15 @@ variable "cidr_block" {
 }
 
 variable "pubsub_cidr" {
-  type = list()
+  type = list(string)
 }
 
 variable "privsub_cidr" {
-  type = list()
+  type = list(string)
 }
 
 variable "az" {
-  type = list()
+  type = list(string)
 }
 
 
