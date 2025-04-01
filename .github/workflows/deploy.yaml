@@ -41,5 +41,5 @@ jobs:
         run: terraform plan -out=tfplan -var-file=envs/${{ env.ENV }}/terraform.tfvars
 
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging'
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev'
         run: terraform apply -auto-approve tfplan
