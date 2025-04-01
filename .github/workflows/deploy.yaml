@@ -38,8 +38,8 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -out=tfplan -var-file=envs/${{ env.ENV }}/terraform.tfvars
-
+        run: terraform plan -out=tfplan -var-file=MYoffice/${{ env.ENV }}/terraform.tfvars
+  # MYoffice/prod
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev'
         run: terraform apply -auto-approve tfplan
