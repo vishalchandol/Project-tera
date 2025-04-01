@@ -14,3 +14,4 @@ module "ec2" {
   sg-inst = var.sg-inst
   env = var.env
 }
+
