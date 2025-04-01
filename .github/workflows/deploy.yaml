@@ -1,50 +1,3 @@
-<<<<<<< HEAD
-name: Terraform Deployment
-
-on:
-  push:
-    branches:
-      - main
-      - staging
-      - dev
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 1.5.0
-
-      - name: Determine Environment Based on Branch
-        id: env
-        run: |
-          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "ENV=prod" >> $GITHUB_ENV
-          elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
-            echo "ENV=staging" >> $GITHUB_ENV
-          else
-            echo "ENV=dev" >> $GITHUB_ENV
-          fi
-        shell: bash
-
-      - name: Terraform Init
-        run: terraform init
-
-      - name: Terraform Validate
-        run: terraform validate
-
-      - name: Terraform Plan
-        run: terraform plan -out=tfplan -var-file=envs/${{ env.ENV }}/terraform.tfvars
-
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging'
-        run: terraform apply -auto-approve tfplan
-=======
 name: Terraform Deployment
 
 on:
@@ -90,4 +43,3 @@ jobs:
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev'
         run: terraform apply -auto-approve tfplan
->>>>>>> 101d99d776db2c5eceff45ab19d1c36e4b63f2ff
