@@ -19,11 +19,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Download Terraform State (if exists)
-        uses: actions/download-artifact@v3
-        with:
-          name: terraform-state
-          path: MYoffice
+    #  - name: Download Terraform State (if exists)
+     #   uses: actions/download-artifact@v3
+     #   with:
+      #    name: terraform-state
+       #   path: MYoffice
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
