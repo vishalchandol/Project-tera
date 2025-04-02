@@ -1,9 +1,4 @@
 
-
-provider "aws" {
-
-}
-
 resource "aws_instance" "inst1" {
   instance_type = "t2.micro"
   #ami = "ami-00224e59617d0d55e"
