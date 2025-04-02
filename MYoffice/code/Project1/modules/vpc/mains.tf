@@ -38,11 +38,11 @@ resource "aws_internet_gateway" "ig1" {
   vpc_id = aws_vpc.vpc1.id
   
 }
-resource "aws_internet_gateway_attachment" "ig1-att" {
-  vpc_id = aws_vpc.vpc1.id
-  internet_gateway_id = aws_internet_gateway.ig1.id
+#resource "aws_internet_gateway_attachment" "ig1-att" {
+ # vpc_id = aws_vpc.vpc1.id
+  #internet_gateway_id = aws_internet_gateway.ig1.id
 
-}
+#}
 
 resource "aws_route_table" "rt1" {
   vpc_id = aws_vpc.vpc1.id
