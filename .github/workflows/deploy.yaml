@@ -7,12 +7,16 @@ on:
       - staging
       - dev
 
+permissions:
+  actions: read   # Required for downloading artifacts
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -38,30 +42,30 @@ jobs:
         run: |
           cd MYoffice
           ls -l  # Debugging step to check files
-      
 
-
-      - name: Check if Terraform State Exists
-        id: check_state
+      ## ✅ Improved: Fetch Artifact ID and Download Terraform State
+      - name: Fetch Artifact Metadata
+        id: artifact_metadata
         run: |
-           if curl -sSf "https://api.github.com/repos/${{ github.repository }}/actions/artifacts" | grep -q terraform-state; then
-              echo "FOUND=true" >> $GITHUB_ENV
-           else
-              echo "FOUND=false" >> $GITHUB_ENV
-           fi
+          ARTIFACT_ID=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts" | \
+            jq -r '[.artifacts[] | select(.name=="terraform-state")] | max_by(.created_at) | .id // ""')
 
+          if [[ -n "$ARTIFACT_ID" ]]; then
+            echo "FOUND=true" >> $GITHUB_ENV
+            echo "ARTIFACT_ID=$ARTIFACT_ID" >> $GITHUB_ENV
+          else
+            echo "FOUND=false" >> $GITHUB_ENV
+          fi
 
-      #
-      #
       - name: Download Terraform State (if exists)
         if: env.FOUND == 'true'
-        uses: actions/download-artifact@v4
-        with:
-           name: terraform-state
-           path: MYoffice
+        run: |
+          curl -L -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          -o terraform-state.zip \
+          "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/${{ env.ARTIFACT_ID }}/zip"
+          mkdir -p MYoffice && unzip terraform-state.zip -d MYoffice
 
-      #
-      #
       - name: Terraform Init
         run: |
           cd MYoffice
@@ -83,6 +87,7 @@ jobs:
           cd MYoffice
           terraform apply -auto-approve tfplan
           
+      ## ✅ Upload Terraform State Again to Preserve State
       - name: Upload Terraform State
         if: success()
         continue-on-error: true
@@ -90,5 +95,3 @@ jobs:
         with:
            name: terraform-state
            path: MYoffice/terraform.tfstate
-
-#enjoy
