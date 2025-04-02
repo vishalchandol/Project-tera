@@ -8,6 +8,9 @@ on:
         required: true
         default: 'dev'
 
+permissions:
+  actions: write
+
 jobs:
   destroy:
     runs-on: ubuntu-latest
