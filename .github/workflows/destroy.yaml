@@ -67,10 +67,20 @@ jobs:
           cd MYoffice
           terraform destroy -auto-approve -input=false -var-file=${{ env.ENV }}/terraform.tfvars
   # Upload again to maintain correct state (althouh empty state file)
+      - name: Delete Old Terraform Artifact
+        continue-on-error: true
+        run: |
+          ARTIFACT_ID=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts" | \
+            jq -r '.artifacts[] | select(.name=="terraform-state") | .id' | head -n 1)
+          if [ -n "$ARTIFACT_ID" ]; then
+            curl -X DELETE -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$ARTIFACT_ID"
+          fi
+
       - name: Upload Terraform State
         if: success()
-        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
-           name: terraform-state
-           path: MYoffice/terraform.tfstate
+          name: terraform-state
+          path: MYoffice/terraform.tfstate
