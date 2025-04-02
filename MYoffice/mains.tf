@@ -1,3 +1,8 @@
+provider "aws" {
+  region = var.region
+}
+
+
 module "vpc" {
   source = "./code/Project1/modules/vpc"
   cidr_block =var.cidr_block
