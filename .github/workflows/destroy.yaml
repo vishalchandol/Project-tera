@@ -19,12 +19,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-    #  - name: Download Terraform State (if exists)
-     #   uses: actions/download-artifact@v3
-     #   with:
-      #    name: terraform-state
-       #   path: MYoffice
-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
@@ -37,7 +31,27 @@ jobs:
         run: |
           cd MYoffice
           ls -l  # Debugging step to check files
+      
+      ##
+      
+      - name: Check if Terraform State Exists
+        id: check_state
+        run: |
+           if curl -sSf "https://api.github.com/repos/${{ github.repository }}/actions/artifacts" | grep -q terraform-state; then
+             echo "FOUND=true" >> $GITHUB_ENV
+           else
+             echo "FOUND=false" >> $GITHUB_ENV
+           fi
 
+      - name: Download Terraform State (if exists)
+        if: env.FOUND == 'true'
+        uses: actions/download-artifact@v4
+        with:
+           name: terraform-state
+           path: MYoffice
+           
+
+      ##
       - name: Terraform Init
         run: |
           cd MYoffice
