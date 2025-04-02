@@ -49,9 +49,11 @@ jobs:
           cd MYoffice
           terraform destroy -auto-approve -input=false -var-file=${{ env.ENV }}/terraform.tfvars
           
-      - name: Upload Terraform State (if exists)
-        if: success() && fileExists('MYoffice/terraform.tfstate')
+      - name: Upload Terraform State
+        if: success()
+        continue-on-error: true
         uses: actions/upload-artifact@v3
         with:
           name: terraform-state
           path: MYoffice/terraform.tfstate
+
