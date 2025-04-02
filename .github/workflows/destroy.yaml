@@ -48,7 +48,8 @@ jobs:
           fi
 
       - name: Debug Artifact ID
-        run: echo "Artifact ID: ${{ env.ARTIFACT_ID }}"
+        run: |
+          echo "Artifact ID: ${{ env.ARTIFACT_ID }}"
 
       ## ✅ Download Terraform State if Exists ##
       - name: Download Terraform State (if exists)
