@@ -38,13 +38,30 @@ jobs:
         run: |
           cd MYoffice
           ls -l  # Debugging step to check files
+      
 
+
+      - name: Check if Terraform State Exists
+        id: check_state
+        run: |
+           if curl -sSf "https://api.github.com/repos/${{ github.repository }}/actions/artifacts" | grep -q terraform-state; then
+              echo "FOUND=true" >> $GITHUB_ENV
+           else
+              echo "FOUND=false" >> $GITHUB_ENV
+           fi
+
+
+      #
+      #
       - name: Download Terraform State (if exists)
+        if: env.FOUND == 'true'
         uses: actions/download-artifact@v4
         with:
-          name: terraform-state
-          path: MYoffice
+           name: terraform-state
+           path: MYoffice
 
+      #
+      #
       - name: Terraform Init
         run: |
           cd MYoffice
@@ -67,7 +84,10 @@ jobs:
           terraform apply -auto-approve tfplan
           
       - name: Upload Terraform State
+        if: success()
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
-          name: terraform-state
-          path: MYoffice/terraform.tfstate
+           name: terraform-state
+           path: MYoffice/terraform.tfstate
+
