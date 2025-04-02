@@ -32,26 +32,31 @@ jobs:
           cd MYoffice
           ls -l  # Debugging step to check files
       
-      ##
+      ## Check and Download Terraform State ##
       
-      - name: Check if Terraform State Exists
-        id: check_state
+      - name: Fetch Artifact Metadata
+        id: artifact_metadata
         run: |
-           if curl -sSf "https://api.github.com/repos/${{ github.repository }}/actions/artifacts" | grep -q terraform-state; then
-             echo "FOUND=true" >> $GITHUB_ENV
-           else
-             echo "FOUND=false" >> $GITHUB_ENV
-           fi
+          ARTIFACT_ID=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts" | \
+            jq -r '.artifacts[] | select(.name=="terraform-state") | .id' || echo "")
+          if [[ -n "$ARTIFACT_ID" ]]; then
+            echo "FOUND=true" >> $GITHUB_ENV
+            echo "ARTIFACT_ID=$ARTIFACT_ID" >> $GITHUB_ENV
+          else
+            echo "FOUND=false" >> $GITHUB_ENV
+          fi
 
       - name: Download Terraform State (if exists)
         if: env.FOUND == 'true'
-        uses: actions/download-artifact@v4
-        with:
-           name: terraform-state
-           path: MYoffice
-           
+        run: |
+          curl -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          -o terraform-state.zip \
+          "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/${{ env.ARTIFACT_ID }}/zip"
+          mkdir -p MYoffice && unzip terraform-state.zip -d MYoffice
 
-      ##
+      ## Terraform Operations ##
+      
       - name: Terraform Init
         run: |
           cd MYoffice
