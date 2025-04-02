@@ -39,6 +39,12 @@ jobs:
           cd MYoffice
           ls -l  # Debugging step to check files
 
+      - name: Download Terraform State (if exists)
+        uses: actions/download-artifact@v3
+        with:
+          name: terraform-state
+          path: MYoffice
+
       - name: Terraform Init
         run: |
           cd MYoffice
@@ -59,3 +65,9 @@ jobs:
         run: |
           cd MYoffice
           terraform apply -auto-approve tfplan
+          
+      - name: Upload Terraform State
+        uses: actions/upload-artifact@v3
+        with:
+          name: terraform-state
+          path: MYoffice/terraform.tfstate

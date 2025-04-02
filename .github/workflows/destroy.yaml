@@ -16,6 +16,12 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+        #added to match refresh state file current
+      - name: Download Terraform State (if exists)
+        uses: actions/download-artifact@v3
+        with:
+          name: terraform-state
+          path: MYoffice
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -38,7 +44,7 @@ jobs:
         run: |
           cd MYoffice
           ls -l  # Debugging step to check files
-
+      
       - name: Terraform Init
         run: |
           cd MYoffice
@@ -56,4 +62,5 @@ jobs:
         with:
           name: terraform-state
           path: MYoffice/terraform.tfstate
+
 
