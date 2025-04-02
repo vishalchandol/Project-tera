@@ -1,0 +1,57 @@
+name: Terraform Destroy
+
+on:
+  workflow_dispatch:  # This will enable manual trigger via GitHub Actions UI
+    inputs:
+      environment:
+        description: 'The environment to destroy (prod, staging, dev)'
+        required: true
+        default: 'dev'
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    env:
+       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.5.0
+
+      - name: Determine Environment Based on Branch
+        id: env
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "ENV=prod" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
+            echo "ENV=dev" >> $GITHUB_ENV
+          else
+            echo "ENV=staging" >> $GITHUB_ENV
+          fi
+        shell: bash
+
+      - name: Change to Terraform Directory
+        run: |
+          cd MYoffice
+          ls -l  # Debugging step to check files
+
+      - name: Terraform Init
+        run: |
+          cd MYoffice
+          terraform init
+
+      - name: Terraform Destroy
+        run: |
+          cd MYoffice
+          terraform destroy -auto-approve -input=false -var-file=${{ env.ENV }}/terraform.tfvars
+          
+      - name: Upload Terraform State (if exists)
+        if: success() && fileExists('MYoffice/terraform.tfstate')
+        uses: actions/upload-artifact@v3
+        with:
+          name: terraform-state
+          path: MYoffice/terraform.tfstate
