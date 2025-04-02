@@ -66,3 +66,11 @@ jobs:
         run: |
           cd MYoffice
           terraform destroy -auto-approve -input=false -var-file=${{ env.ENV }}/terraform.tfvars
+  # Upload again to maintain correct state (althouh empty state file)
+      - name: Upload Terraform State
+        if: success()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+           name: terraform-state
+           path: MYoffice/terraform.tfstate
