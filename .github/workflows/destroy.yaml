@@ -72,7 +72,6 @@ jobs:
           cd MYoffice
           terraform destroy -auto-approve -input=false -var-file=${{ env.ENV }}/terraform.tfvars
 
-      ## ✅ Clean Up Old Terraform State ##
       - name: Delete Old Terraform Artifact
         continue-on-error: true
         run: |
@@ -84,6 +83,7 @@ jobs:
 
           if [ -n "$ARTIFACT_IDS" ]; then
             for ARTIFACT_ID in $ARTIFACT_IDS; do
+              echo "Deleting artifact ID: $ARTIFACT_ID"
               curl -X DELETE -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
               "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$ARTIFACT_ID"
               echo "Deleted artifact ID: $ARTIFACT_ID"
