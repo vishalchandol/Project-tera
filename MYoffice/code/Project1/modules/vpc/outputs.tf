@@ -5,3 +5,5 @@ output "pub_sg_ids" {
 output "pub_sub_id" {
   value = aws_subnet.pubsub[*].id
 }
+
+
