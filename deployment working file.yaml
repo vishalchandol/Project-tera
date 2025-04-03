@@ -1,0 +1,94 @@
+name: Terraform Deployment
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+      - dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.5.0
+
+      - name: Determine Environment Based on Branch
+        id: env
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "ENV=prod" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
+            echo "ENV=dev" >> $GITHUB_ENV
+          else
+            echo "ENV=staging" >> $GITHUB_ENV
+          fi
+        shell: bash
+
+      - name: Change to Terraform Directory
+        run: |
+          cd MYoffice
+          ls -l  # Debugging step to check files
+      
+
+
+      - name: Check if Terraform State Exists
+        id: check_state
+        run: |
+           if curl -sSf "https://api.github.com/repos/${{ github.repository }}/actions/artifacts" | grep -q terraform-state; then
+              echo "FOUND=true" >> $GITHUB_ENV
+           else
+              echo "FOUND=false" >> $GITHUB_ENV
+           fi
+
+
+      #
+      #
+      - name: Download Terraform State (if exists)
+        if: env.FOUND == 'true'
+        uses: actions/download-artifact@v4
+        with:
+           name: terraform-state
+           path: MYoffice
+
+      #
+      #
+      - name: Terraform Init
+        run: |
+          cd MYoffice
+          terraform init
+
+      - name: Terraform Validate
+        run: |
+          cd MYoffice
+          terraform validate
+
+      - name: Terraform Plan
+        run: |
+          cd MYoffice
+          terraform plan -out=tfplan -var-file=${{ env.ENV }}/terraform.tfvars
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev'
+        run: |
+          cd MYoffice
+          terraform apply -auto-approve tfplan
+          
+      - name: Upload Terraform State
+        if: success()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+           name: terraform-state
+           path: MYoffice/terraform.tfstate
+
+#enjoy again
