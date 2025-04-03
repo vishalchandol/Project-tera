@@ -53,16 +53,24 @@ jobs:
       - name: Debug Artifact ID
         run: |
           echo "Artifact ID: ${{ env.ARTIFACT_ID }}"
+          
+ ## ✅ Download Terraform State (Improved) ##
+      - name: Download Terraform State (if exists)
+        if: ${{ env.FOUND == 'true' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: terraform-state
+          path: MYoffice
 
       ## ✅ Download Terraform State if Exists ##
-      - name: Download Terraform State (if exists)
-        if: env.FOUND == 'true'
-        run: |
-          echo "Downloading artifact with ID: ${{ env.ARTIFACT_ID }}"
-          curl -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          -o terraform-state.zip \
-          "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/${{ env.ARTIFACT_ID }}/zip"
-          mkdir -p MYoffice && unzip terraform-state.zip -d MYoffice
+     ## - name: Download Terraform State (if exists)
+      ##  if: env.FOUND == 'true'
+      ##  run: |
+      ##    echo "Downloading artifact with ID: ${{ env.ARTIFACT_ID }}"
+      #    curl -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+      #    -o terraform-state.zip \
+       #   "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/${{ env.ARTIFACT_ID }}/zip"
+       #   mkdir -p MYoffice && unzip terraform-state.zip -d MYoffice
 
       ## ✅ Terraform Operations ##
       - name: Terraform Init
