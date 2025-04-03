@@ -7,16 +7,12 @@ on:
       - staging
       - dev
 
-permissions:
-  actions: read   # Required for downloading artifacts
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -42,30 +38,30 @@ jobs:
         run: |
           cd MYoffice
           ls -l  # Debugging step to check files
+      
 
-      ## ✅ Improved: Fetch Artifact ID and Download Terraform State
-      - name: Fetch Artifact Metadata
-        id: artifact_metadata
+
+      - name: Check if Terraform State Exists
+        id: check_state
         run: |
-          ARTIFACT_ID=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts" | \
-            jq -r '[.artifacts[] | select(.name=="terraform-state")] | max_by(.created_at) | .id // ""')
+           if curl -sSf "https://api.github.com/repos/${{ github.repository }}/actions/artifacts" | grep -q terraform-state; then
+              echo "FOUND=true" >> $GITHUB_ENV
+           else
+              echo "FOUND=false" >> $GITHUB_ENV
+           fi
 
-          if [[ -n "$ARTIFACT_ID" ]]; then
-            echo "FOUND=true" >> $GITHUB_ENV
-            echo "ARTIFACT_ID=$ARTIFACT_ID" >> $GITHUB_ENV
-          else
-            echo "FOUND=false" >> $GITHUB_ENV
-          fi
 
+      #
+      #
       - name: Download Terraform State (if exists)
         if: env.FOUND == 'true'
-        run: |
-          curl -L -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          -o terraform-state.zip \
-          "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/${{ env.ARTIFACT_ID }}/zip"
-          mkdir -p MYoffice && unzip terraform-state.zip -d MYoffice
+        uses: actions/download-artifact@v4
+        with:
+           name: terraform-state
+           path: MYoffice
 
+      #
+      #
       - name: Terraform Init
         run: |
           cd MYoffice
@@ -86,8 +82,33 @@ jobs:
         run: |
           cd MYoffice
           terraform apply -auto-approve tfplan
-          
-      ## ✅ Upload Terraform State Again to Preserve State
+
+
+######## Delete Old Artifact before new upload - helps to maintain current state
+
+      - name: Delete Old Terraform Artifact
+        continue-on-error: true
+        run: |
+          ARTIFACT_IDS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts" | \
+            jq -r '.artifacts[] | select(.name=="terraform-state") | .id')
+
+          echo "Found artifacts: $ARTIFACT_IDS"
+
+          if [ -n "$ARTIFACT_IDS" ]; then
+            for ARTIFACT_ID in $ARTIFACT_IDS; do
+              curl -X DELETE -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$ARTIFACT_ID"
+              echo "Deleted artifact ID: $ARTIFACT_ID"
+            done
+          else
+            echo "No terraform-state artifact found to delete."
+          fi
+
+
+
+######## Delete Old Artifact before new upload - helps to maintain current state
+
       - name: Upload Terraform State
         if: success()
         continue-on-error: true
@@ -95,3 +116,5 @@ jobs:
         with:
            name: terraform-state
            path: MYoffice/terraform.tfstate
+
+#test
