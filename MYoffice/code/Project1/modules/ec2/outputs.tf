@@ -1,3 +1,3 @@
 output "inst1_id" {
-  value = aws_instance.inst1.id
+  value = aws_instance.inst2.id
 }
