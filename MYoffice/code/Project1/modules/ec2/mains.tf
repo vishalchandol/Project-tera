@@ -16,4 +16,4 @@ resource "aws_instance" "inst1" {
  # key_name = aws_key_pair.kp1.key_name
 
 }
-
+#destr
