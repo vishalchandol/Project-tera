@@ -13,6 +13,7 @@ jobs:
     env:
        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -38,30 +39,33 @@ jobs:
         run: |
           cd MYoffice
           ls -l  # Debugging step to check files
-      
-
 
       - name: Check if Terraform State Exists
         id: check_state
         run: |
-           if curl -sSf "https://api.github.com/repos/${{ github.repository }}/actions/artifacts" | grep -q terraform-state; then
-              echo "FOUND=true" >> $GITHUB_ENV
-           else
-              echo "FOUND=false" >> $GITHUB_ENV
-           fi
+          ARTIFACTS=$(curl -sSf -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts")
+          
+          RUN_ID=$(echo "$ARTIFACTS" | jq -r '[.artifacts[] | select(.name=="terraform-state") | .workflow_run.id] | max')
 
+          if [[ -n "$RUN_ID" && "$RUN_ID" != "null" ]]; then
+            echo "FOUND=true" >> $GITHUB_ENV
+            echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
+            echo "FOUND=true"
+          else
+            echo "FOUND=false" >> $GITHUB_ENV
+            echo "FOUND=false"
+          fi
 
-      #
-      #
       - name: Download Terraform State (if exists)
         if: env.FOUND == 'true'
-        uses: actions/download-artifact@v4
+        uses: dawidd6/action-download-artifact@v3
         with:
-           name: terraform-state
-           path: MYoffice
+          name: terraform-state
+          path: MYoffice
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          run_id: ${{ env.RUN_ID }}
 
-      #
-      #
       - name: Terraform Init
         run: |
           cd MYoffice
@@ -83,31 +87,23 @@ jobs:
           cd MYoffice
           terraform apply -auto-approve tfplan
 
-
-######## Delete Old Artifact before new upload - helps to maintain current state
-
       - name: Delete Old Terraform Artifact
         continue-on-error: true
         run: |
-          ARTIFACT_IDS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts" | \
-            jq -r '.artifacts[] | select(.name=="terraform-state") | .id')
+          ARTIFACTS=$(curl -sSf -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts")
 
-          echo "Found artifacts: $ARTIFACT_IDS"
+          ARTIFACT_IDS=$(echo "$ARTIFACTS" | jq -r '.artifacts[] | select(.name=="terraform-state") | .id' | sort -nr | tail -n +2)
 
-          if [ -n "$ARTIFACT_IDS" ]; then
-            for ARTIFACT_ID in $ARTIFACT_IDS; do
+          if [[ -n "$ARTIFACT_IDS" ]]; then
+            for ID in $ARTIFACT_IDS; do
               curl -X DELETE -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$ARTIFACT_ID"
-              echo "Deleted artifact ID: $ARTIFACT_ID"
+                "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$ID"
+              echo "Deleted old artifact ID: $ID"
             done
           else
-            echo "No terraform-state artifact found to delete."
+            echo "No old terraform-state artifacts to delete."
           fi
-
-
-
-######## Delete Old Artifact before new upload - helps to maintain current state
 
       - name: Upload Terraform State
         if: success()
@@ -116,6 +112,3 @@ jobs:
         with:
            name: terraform-state
            path: MYoffice/terraform.tfstate
-
-#test
-#test
